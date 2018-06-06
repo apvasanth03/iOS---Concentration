@@ -10,13 +10,33 @@ import Foundation
 
 class Concentration{
     
-    var cards = [Card]()
-    var indexOfOneAndOnlyFaceUpCard: Int? = nil
-    var noOfFilips = 0
-    var score = 0
-    var previouslySeenCards = [Int]()
+    private(set) var cards = [Card]()
+    private var indexOfOneAndOnlyFaceUpCard: Int? {
+        get{
+            var foundIndex: Int?
+            for index in cards.indices{
+                if cards[index].isFaceUp{
+                    if foundIndex == nil{
+                        foundIndex = index
+                    }else{
+                        return nil
+                    }
+                }
+            }
+            return foundIndex
+        }set{
+            for index in cards.indices{
+                cards[index].isFaceUp = (index == newValue)
+            }
+        }
+    }
+    private(set) var noOfFilips = 0
+    private(set) var score = 0
+    private var previouslySeenCards = [Int]()
     
     init(noOfPairOfCards: Int) {
+        assert(noOfPairOfCards>0, "Concentration.init(\(noOfPairOfCards): you must have atleast one pair of cards ")
+        
         for _ in 0..<noOfPairOfCards{
             let card = Card()
             cards += [card, card] // Struct is a value type, hence it will be copied.
@@ -36,6 +56,8 @@ class Concentration{
     }
     
     func chooseCard(at index: Int){
+        assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index):  chosen index is not in the cards")
+        
         if !cards[index].isMatched{
             noOfFilips += 1
             
@@ -57,15 +79,10 @@ class Concentration{
                     }
                 }
                 cards[index].isFaceUp = true
-                indexOfOneAndOnlyFaceUpCard = nil
                 
                 addCardsToPreviouslySeenCards(first: cards[matchIndex], second: cards[index])
             }else{
                 // either no card or two card is already faceup.
-                for filpDownIndex in cards.indices{
-                    cards[filpDownIndex].isFaceUp = false
-                }
-                cards[index].isFaceUp = true
                 indexOfOneAndOnlyFaceUpCard = index
             }
         }
