@@ -10,18 +10,33 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    private let animalTheme = ["🦇", "🐅", "🐘", "🐈", "🐿"]
-    
-    private lazy var game = Concentration(noOfPairOfCards: self.noOfPairOfCards)
-    var noOfPairOfCards: Int {
-        return (cardButtons.count+1)
-    }
-    private lazy var emojiChoices = self.animalTheme
-    private var emoji = [Int:String]()
-    
+    // MARK: variables
     @IBOutlet weak private var scoreLabel: UILabel!
     @IBOutlet private var cardButtons: [UIButton]!
     
+    private var theme: [[String]] = []
+    private var randomTheme: [String] = []
+    private var animals: [String] = []
+    private var sports: [String] = []
+    private var faces: [String] = []
+    private var cars: [String] = []
+    private var flags: [String] = []
+    private var foods: [String] = []
+    private var emoji = [Int: String]()
+    private var game: Concentration!
+    var noOfPairOfCards: Int {
+        return (cardButtons.count+1)
+    }
+    
+    // MARK: Overriden Functions
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setUp()
+    }
+    
+    // MARK: Functions
+    // Gets invoked on touch of card.
     @IBAction private func touchCard(_ sender: UIButton) {
         if let cardNumber = cardButtons.index(of: sender){
             game.chooseCard(at: cardNumber)
@@ -29,11 +44,33 @@ class ViewController: UIViewController {
         }
     }
     
+    // Gets invoked on touch of newCard.
     @IBAction private func newGame(_ sender: UIButton) {
-        game = Concentration(noOfPairOfCards: (self.cardButtons.count+1)/2)
-        emojiChoices = animalTheme
+        setUp()
+    }
+    
+    // MARK: Private Functions
+    private func setUp(){
+        game = Concentration(noOfPairOfCards: noOfPairOfCards)
+        setupTheme()
         emoji = [:]
         updateViewFromModel()
+    }
+    
+    private func setupTheme() {
+        animals = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮"]
+        sports = ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🥅", "🏒"]
+        faces = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "☺️", "😊", "😇", "🙂"]
+        cars = ["🚗", "🚕", "🚙", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🚐", "🚚", "🚛"]
+        flags = ["🇹🇼", "🇯🇵", "🏳️", "🏴", "🏁", "🚩", "🏳️‍🌈", "🇱🇷", "🎌", "🇨🇦", "🇳🇵", "🇬🇪"]
+        foods = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍈", "🍒", "🍑"]
+        theme = [animals, sports, faces, cars, flags, foods]
+        randomTheme = getRandomTheme()
+    }
+    
+    private func getRandomTheme() -> [String] {
+        let index = theme.count.arc4random
+        return theme[index]
     }
     
     private func updateViewFromModel(){
@@ -53,8 +90,8 @@ class ViewController: UIViewController {
     }
     
     private func emoji(for card : Card) -> String{
-        if emoji[card.identifier] == nil, emojiChoices.count > 0{
-            emoji[card.identifier] = emojiChoices.remove(at: emojiChoices.count.arc4random)
+        if emoji[card.identifier] == nil, randomTheme.count > 0{
+            emoji[card.identifier] = randomTheme.remove(at: randomTheme.count.arc4random)
         }
         return emoji[card.identifier] ?? "?"
     }
