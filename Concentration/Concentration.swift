@@ -31,17 +31,8 @@ class Concentration{
             cards += [card, card] // Struct is a value type, hence it will be copied.
         }
         
-        suffleCards() // Suffle cards.
-    }
-    
-    // Suffle the cards.
-    private func suffleCards(){
-        var temp = [Card]()
-        for _ in cards{
-            let randomIndex = Int(arc4random_uniform(UInt32(cards.count)))
-            temp.append(cards.remove(at: randomIndex))
-        }
-        cards = temp
+        // Suffle cards.
+        cards.suffle()
     }
     
     func chooseCard(at index: Int){
@@ -80,5 +71,18 @@ extension Collection{
     var oneAndOnly: Element? {
         return count == 1 ? first : nil
     }
-    
+}
+
+extension Array{
+    // Suffle the Array (1000 Times)
+    mutating func suffle(){
+        for _ in 1...1000{
+            for index in self.indices{
+                let randomIndex = self.count.arc4random
+                let temp = self[index]
+                self[index] = self[randomIndex]
+                self[randomIndex] = temp
+            }
+        }
+    }
 }
