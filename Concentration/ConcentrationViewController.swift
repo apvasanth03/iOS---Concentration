@@ -17,7 +17,7 @@ class ConcentrationViewController: UIViewController {
             emojiChoices = theme
             emoji = [:]
             // Added nil check - Because in some cases this property may be set before ViewController has been loaded (Since it is set from other controller).
-            if cardButtons != nil{
+            if visibleCardButtons != nil{
                 updateViewFromModel()
             }
         }
@@ -26,11 +26,16 @@ class ConcentrationViewController: UIViewController {
     @IBOutlet weak private var scoreLabel: UILabel!
     @IBOutlet private var cardButtons: [UIButton]!
     
+    // Returns visible cardButtons for the current size (Compact or Regular Height).
+    private var visibleCardButtons: [UIButton]! {
+        return cardButtons?.filter{!$0.superview!.isHidden}
+    }
+    
     private var emojiChoices = [String]()
     private var emoji = [Int: String]()
     private var game: Concentration!
     var noOfPairOfCards: Int {
-        return (cardButtons.count/2)
+        return (visibleCardButtons.count/2)
     }
     
     // MARK: UIViewController Functions
@@ -40,10 +45,16 @@ class ConcentrationViewController: UIViewController {
         setUp()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        updateViewFromModel()
+    }
+    
     // MARK: Action Methods.
     // Gets invoked on touch of card.
     @IBAction private func touchCard(_ sender: UIButton) {
-        if let cardNumber = cardButtons.index(of: sender){
+        if let cardNumber = visibleCardButtons.index(of: sender){
             game.chooseCard(at: cardNumber)
             updateViewFromModel()
         }
@@ -63,8 +74,8 @@ class ConcentrationViewController: UIViewController {
     }
     
     private func updateViewFromModel(){
-        for index in cardButtons.indices{
-            let button = cardButtons[index]
+        for index in visibleCardButtons.indices{
+            let button = visibleCardButtons[index]
             let card = game.cards[index]
             if card.isFaceUp{
                 button.setTitle(emoji(for: card), for: UIControlState.normal)
